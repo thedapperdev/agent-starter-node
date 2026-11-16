@@ -10,7 +10,7 @@ dotenv.config({ path: '.env.local' });
 
 export default defineAgent({
   entry: async (ctx) => {
-    // OpenAI Realtime handles speech input, turn detection and speech output.
+    // GPT-Live owns the full-duplex conversation; Responses handles delegated reasoning.
     const session = new voice.AgentSession();
 
     await session.start({
@@ -23,7 +23,7 @@ export default defineAgent({
 
     // Speak first: greet the user before they say anything
     session.generateReply({
-      instructions: 'Enthusiastically greet the user and offer to help.',
+      instructions: 'Briefly greet the user warmly in British English and offer to help.',
     });
   },
 });

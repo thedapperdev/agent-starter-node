@@ -25,11 +25,18 @@ The starter includes:
 
 The starter works with any [custom web or mobile frontend](https://docs.livekit.io/frontends/) or with [telephony](https://docs.livekit.io/telephony/).
 
-## This fork: local LiveKit + OpenAI Realtime
+## This fork: local LiveKit + OpenAI GPT-Live
 
-This branch uses the official OpenAI plugin with `gpt-realtime-2.1` and the
-`marin` voice. The starter's general-assistant instructions are unchanged.
-There is no application-specific intake, persistence or orchestration.
+This branch uses the official OpenAI plugin with `gpt-live-1`, the `marin`
+voice and Responses delegation to `gpt-6-luna`. The voice prompt uses OpenAI's
+`Generate <|SpawnThinking|>` instruction for careful reasoning and corrections
+to delegated work. It requests a brief, natural acknowledgement while that work
+runs; ordinary conversation does not require delegation.
+
+The SDK owns the full-duplex audio and delegation lifecycle. There is no custom
+transcript scheduler, application-specific intake, persistence or orchestration.
+No search, booking or answer-saving tools are configured. Both voice and delegated
+reasoning use the OpenAI account configured by `OPENAI_API_KEY`.
 
 Use Node 24 (`nvm use`) and pnpm 10.33.2. Install with `pnpm install --frozen-lockfile`.
 Copy `.env.example` to `.env.local`, then set:
@@ -48,7 +55,11 @@ production credentials. Keep the server bound to loopback:
 livekit-server --dev --bind 127.0.0.1
 ```
 
-In another terminal, run `pnpm dev` to register the idle agent worker. To talk
+In another terminal, run `pnpm dev --deployment production` to register the idle
+agent worker in the default namespace on this local server. Here, `production`
+selects that namespace; it does not deploy to a hosted environment. The companion
+React starter at `http://localhost:3000` dispatches to agent name `my-agent`.
+To talk
 to the agent yourself using your microphone and speakers, run `lk agent console`
 from this directory. Press `q` to end the console session. The console connects
 directly to the local agent; it does not require the worker or a web frontend.
@@ -57,14 +68,27 @@ Starting a conversation uses your OpenAI account and incurs model charges.
 `pnpm typecheck`, `pnpm lint` and `pnpm format:check` are offline checks.
 The upstream example test is commented out; there is no active behavioural
 suite. The debugger and simulations use real inference, so they are separate
-from those offline checks. Live speech quality remains unverified until tested.
+from those offline checks and require explicit approval before an automated run.
+The retained scenarios cover calculation, corrected figures and unavailable tools;
+they have not been run for this configuration. Text scenarios cannot establish
+full-duplex interruption behaviour or audible latency.
 
-References: [OpenAI plugin](https://docs.livekit.io/agents/models/realtime/openai/#plugin)
+For a manual browser check, start a new call, ask the quote comparison from
+`scenarios.yaml`, and correct the upfront fee while the assistant is working.
+Check both time to acknowledgement and time to the correct substantive answer;
+hearing a quick acknowledgement alone is not latency acceptance. Confirm that
+ordinary conversation does not repeatedly announce background work. Model access,
+actual delegation, correction handling and speech quality remain unverified until
+this configuration is exercised with a real call.
+
+References: [GPT-Live plugin](https://docs.livekit.io/agents/models/realtime/gpt-live/),
+[OpenAI prompting](https://developers.openai.com/api/docs/guides/live-prompting),
+[OpenAI delegation](https://developers.openai.com/api/docs/guides/live-delegation)
 and [local LiveKit server](https://docs.livekit.io/transport/self-hosting/local/).
 
 The rest of this README is the upstream template guide. Its Cloud inference,
 noise-cancellation and expressive-pipeline descriptions do not describe this
-branch's direct OpenAI Realtime configuration.
+branch's direct OpenAI GPT-Live configuration.
 
 ## Using coding agents
 
