@@ -1,4 +1,5 @@
-import { Agent, dedent, inference } from '@livekit/agents';
+import { Agent, dedent } from '@livekit/agents';
+import * as openai from '@livekit/agents-plugin-openai';
 
 // Build a custom voice AI assistant with the functional `Agent.create` API
 export function createAgent() {
@@ -37,15 +38,9 @@ export function createAgent() {
         - Protect privacy and minimize sensitive data.
       `,
 
-    // A Large Language Model (LLM) is your agent's brain, processing user input and generating a response
-    // See all available models at https://docs.livekit.io/agents/models/llm/
-    llm: new inference.LLM({ model: 'google/gemma-4-31b-it' }),
-
-    // To use a realtime model instead of a voice pipeline, replace the LLM
-    // with a realtime model and remove the stt, tts, turnHandling, and expressive
-    // options from the AgentSession. No provider API key is needed.
-    // (Note: This is for OpenAI GPT-Live. For other models, see https://docs.livekit.io/agents/models/realtime/)
-    // llm: new inference.DuplexModel({ model: 'openai/gpt-live-1', voice: 'marin' }),
+    // Connect directly to OpenAI using OPENAI_API_KEY.
+    // https://docs.livekit.io/agents/models/realtime/openai/#plugin
+    llm: new openai.realtime.RealtimeModel({ model: 'gpt-realtime-2.1', voice: 'marin' }),
 
     // To add tools, specify `tools` in the constructor.
     // Here's an example that adds a simple weather tool.

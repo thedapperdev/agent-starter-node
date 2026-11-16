@@ -2,3 +2,7 @@ allowBuilds:
   '@livekit/local-inference': true
   protobufjs: true
   sharp: true
+
+# Keep the telemetry API within the upstream SDKs' declared peer range.
+overrides:
+  '@opentelemetry/api': '1.9.0'

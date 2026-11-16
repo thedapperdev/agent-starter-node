@@ -25,6 +25,47 @@ The starter includes:
 
 The starter works with any [custom web or mobile frontend](https://docs.livekit.io/frontends/) or with [telephony](https://docs.livekit.io/telephony/).
 
+## This fork: local LiveKit + OpenAI Realtime
+
+This branch uses the official OpenAI plugin with `gpt-realtime-2.1` and the
+`marin` voice. The starter's general-assistant instructions are unchanged.
+There is no application-specific intake, persistence or orchestration.
+
+Use Node 24 (`nvm use`) and pnpm 10.33.2. Install with `pnpm install --frozen-lockfile`.
+Copy `.env.example` to `.env.local`, then set:
+
+```dotenv
+LIVEKIT_URL=ws://127.0.0.1:7880
+LIVEKIT_API_KEY=devkey
+LIVEKIT_API_SECRET=secret
+OPENAI_API_KEY=your-private-key
+```
+
+The LiveKit values above are the official local development credentials, not
+production credentials. Keep the server bound to loopback:
+
+```sh
+livekit-server --dev --bind 127.0.0.1
+```
+
+In another terminal, run `pnpm dev` to register the idle agent worker. To talk
+to the agent yourself using your microphone and speakers, run `lk agent console`
+from this directory. Press `q` to end the console session. The console connects
+directly to the local agent; it does not require the worker or a web frontend.
+Starting a conversation uses your OpenAI account and incurs model charges.
+
+`pnpm typecheck`, `pnpm lint` and `pnpm format:check` are offline checks.
+The upstream example test is commented out; there is no active behavioural
+suite. The debugger and simulations use real inference, so they are separate
+from those offline checks. Live speech quality remains unverified until tested.
+
+References: [OpenAI plugin](https://docs.livekit.io/agents/models/realtime/openai/#plugin)
+and [local LiveKit server](https://docs.livekit.io/transport/self-hosting/local/).
+
+The rest of this README is the upstream template guide. Its Cloud inference,
+noise-cancellation and expressive-pipeline descriptions do not describe this
+branch's direct OpenAI Realtime configuration.
+
 ## Using coding agents
 
 This project works with coding agents like [Claude Code](https://claude.com/product/claude-code), [Cursor](https://www.cursor.com/), and [Codex](https://openai.com/codex/).
