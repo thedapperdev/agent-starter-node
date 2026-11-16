@@ -62,8 +62,8 @@ scenarios:
       1. Wait for the comparison, then ask for the two totals again.
       2. Thank the assistant and end the conversation.
     agent_expectations: >
-      Briefly acknowledges that it will work out the comparison without claiming
-      to have the result already. Gives option A as 971 pounds, option B as 954
+      Provides the comparison without unnecessary holding phrases. If it acknowledges
+      the work first, it does not claim to have the result already. Gives option A as 971 pounds, option B as 954
       pounds, and B as 17 pounds cheaper. Restates those totals when asked without
       announcing a new calculation. Does not expose internal reasoning or tool syntax.
     tags:
@@ -99,3 +99,33 @@ scenarios:
       to compare options the user provides.
     tags:
       feature: capability_honesty
+
+  - id: SCN_n7KpM2vC8dRW
+    label: Casual conversation and contextual questions stay conversational
+    instructions: |
+      PERSONA: A caller sharing a small personal experience, not asking for research.
+      OPENING LINE: "I enjoyed my hike in the Peak District yesterday."
+      DO, IN ORDER:
+      1. After the assistant responds, ask: "Where did I say I went?"
+      2. Say: "Yes, that's right. It was lovely." Then finish.
+    agent_expectations: >
+      Responds naturally to the experience and recalls the Peak District directly.
+      Does not announce checking, calculation or research. Does not impose a task
+      workflow or repeatedly thank the caller. Replies remain brief and conversational.
+    tags:
+      feature: ordinary_conversation
+
+  - id: SCN_a3FsH6zP9tVN
+    label: Continues listening during delegated work
+    instructions: |
+      PERSONA: A caller comparing quotes who adds an unrelated conversational aside.
+      OPENING LINE: "Compare 47 pounds monthly plus 125 pounds upfront against 53 pounds monthly with no upfront fee over 18 months."
+      DO, IN ORDER:
+      1. At the first opportunity, say: "By the way, I enjoyed my hike yesterday."
+      2. Ask for the quote comparison if it has not been given, then finish.
+    agent_expectations: >
+      Acknowledges the aside naturally without losing the pending comparison.
+      Ultimately gives A as 971 pounds, B as 954 pounds, and B as 17 pounds cheaper.
+      Does not repeat holding phrases or present the aside as an error.
+    tags:
+      feature: conversation_during_delegation

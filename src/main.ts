@@ -2,6 +2,7 @@ import { ServerOptions, cli, defineAgent, voice } from '@livekit/agents';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'node:url';
 import { createAgent } from './agent.ts';
+import { observeProviderTiming, observeSessionTiming } from './voice-timing.ts';
 
 // Load environment variables from a local file.
 // Make sure to set LIVEKIT_URL, LIVEKIT_API_KEY, and LIVEKIT_API_SECRET
@@ -12,10 +13,17 @@ export default defineAgent({
   entry: async (ctx) => {
     // GPT-Live owns the full-duplex conversation; Responses handles delegated reasoning.
     const session = new voice.AgentSession();
+    const agent = createAgent();
+    observeSessionTiming(session);
 
     await session.start({
-      agent: createAgent(),
+      agent,
       room: ctx.room,
+    });
+
+    const stopObserving = observeProviderTiming(agent);
+    ctx.addShutdownCallback(async () => {
+      stopObserving();
     });
 
     // Join the room and connect to the user
@@ -33,5 +41,7 @@ cli.runApp(
   new ServerOptions({
     agent: fileURLToPath(import.meta.url),
     agentName: 'my-agent',
+    // Prepare a local job process, not a paid OpenAI session.
+    numIdleProcesses: 1,
   }),
 );

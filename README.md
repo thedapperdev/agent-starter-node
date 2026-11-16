@@ -28,11 +28,14 @@ The starter works with any [custom web or mobile frontend](https://docs.livekit.
 ## This fork: local LiveKit + OpenAI GPT-Live
 
 This branch uses the official OpenAI plugin with `gpt-live-1`, the `marin`
-voice and Responses delegation to `gpt-6-luna`. The voice prompt uses OpenAI's
+voice and Responses delegation to `gpt-6-luna` with low reasoning effort and low
+output verbosity. The voice prompt uses OpenAI's
 `Generate <|SpawnThinking|>` instruction for careful reasoning and corrections
 to delegated work. It requests a brief, natural acknowledgement while that work
 runs; ordinary conversation does not require delegation.
 
+One local job process stays ready (`numIdleProcesses: 1`), reducing process
+startup work when a call arrives. It does not open or warm a paid OpenAI session.
 The SDK owns the full-duplex audio and delegation lifecycle. There is no custom
 transcript scheduler, application-specific intake, persistence or orchestration.
 No search, booking or answer-saving tools are configured. Both voice and delegated
@@ -66,10 +69,11 @@ directly to the local agent; it does not require the worker or a web frontend.
 Starting a conversation uses your OpenAI account and incurs model charges.
 
 `pnpm typecheck`, `pnpm lint` and `pnpm format:check` are offline checks.
-The upstream example test is commented out; there is no active behavioural
-suite. The debugger and simulations use real inference, so they are separate
+`pnpm test` runs only offline timing-metadata tests; it does not test model
+behaviour. The debugger and simulations use real inference, so they are separate
 from those offline checks and require explicit approval before an automated run.
-The retained scenarios cover calculation, corrected figures and unavailable tools;
+The retained scenarios cover casual conversation, contextual questions, calculation,
+corrected figures, conversational asides during work and unavailable tools;
 they have not been run for this configuration. Text scenarios cannot establish
 full-duplex interruption behaviour or audible latency.
 
@@ -80,6 +84,21 @@ hearing a quick acknowledgement alone is not latency acceptance. Confirm that
 ordinary conversation does not repeatedly announce background work. Model access,
 actual delegation, correction handling and speech quality remain unverified until
 this configuration is exercised with a real call.
+
+For comparison, commit `9396e95` is the preceding GPT-Live baseline. The new
+configuration is not a measured latency improvement until compared with real audio.
+Use the same device, network and scenario inputs; keep corrections and interruptions
+as acceptance checks alongside both acknowledgement and useful-answer delays.
+
+The worker emits `voice_timing` logs with job context, session/delegation/response
+IDs and observation timestamps for state changes and backend lifecycle events.
+Subtract `response.created` from its matching terminal event for backend duration;
+keep failed and incomplete responses separate from successes. These logs contain
+no audio, transcripts or backend result bodies. SDK speaking-state timestamps are
+server observations, not proof of audible browser playback or useful answer content.
+Use an approved local browser audio recording during the user's test to measure
+end of speech to first audible acknowledgement and first useful answer; compare
+those with the provider timeline. No automated recording or paid test is enabled.
 
 References: [GPT-Live plugin](https://docs.livekit.io/agents/models/realtime/gpt-live/),
 [OpenAI prompting](https://developers.openai.com/api/docs/guides/live-prompting),

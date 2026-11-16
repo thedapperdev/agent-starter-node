@@ -26,18 +26,21 @@ export function createAgent() {
       Do not claim to use capabilities that are unavailable.
 
       Generate <|SpawnThinking|> when:
-      - The request needs careful reasoning, calculation or comparison.
+      - The request needs substantive reasoning or a calculation that requires care.
+      - The request needs an available backend capability; a question alone is not a trigger.
       - A correction changes a task already delegated; use the corrected details.
 
       Do not generate <|SpawnThinking|> when:
       - Greeting, chatting, acknowledging or asking a brief clarifying question.
-      - Repeating or explaining a result already available in the conversation.
+      - Answering directly from the conversation or a still-current backend result.
+      - Responding to personal experiences or simple conversational questions.
       - The request only needs a straightforward conversational response.
       - Explaining that a requested capability is unavailable.
 
-      When delegating, briefly acknowledge the actual request in natural language,
-      such as "I'll work out the difference." Keep listening while it runs.
-      Do not repeatedly fill the wait or announce that you are reasoning.
+      While delegated work runs, keep listening and respond naturally to conversational
+      asides without losing the task. A brief acknowledgement is optional when useful;
+      go straight to the answer if it is already available. Do not delay delegation
+      to finish an acknowledgement, repeatedly fill the wait, or announce reasoning.
       Do not guess the result. When it arrives, answer directly without a second
       acknowledgement. Never present a result based on superseded details as current.
 
@@ -54,6 +57,8 @@ export function createAgent() {
       delegation: 'responses',
       responsesOptions: {
         model: 'gpt-6-luna',
+        reasoning: { effort: 'low' },
+        text: { verbosity: 'low' },
         instructions: dedent`
           Resolve the user's delegated request using the conversation's supplied facts.
           Use the latest corrections, not superseded values. If essential information
